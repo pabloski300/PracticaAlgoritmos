@@ -43,13 +43,13 @@ public class Planifica {
      * lo saca de la lista de candidatos, actualiza las horas del resto de 
      * candidatos restandoles la hora de fin del candidato y elimina los candidatos
      * que ya no sea posible usar por las condiciones del problema, por último 
-     * introduce el candidato en la solucion.
+     * introduce el candidato en la solucion. 
      */
 
     public void AlgoritmoVoraz() {
         while(!reuniones.isEmpty()){
             
-            Reunion candidato = SeleccionarCandidato();     //Funcion de seleccion.
+            Reunion candidato = SeleccionarCandidato(0,reuniones.size()-1);     //Funcion de seleccion.
             
             reuniones.remove(candidato);                    //Eliminacion del candidato de la lista
             
@@ -185,11 +185,24 @@ public class Planifica {
     /**
      * Esta funcion se encarga de elegir el mejor condidato de la lista de candidatos
      * para ello se escoge el candidato con menor hora de finalizacion.
+     * 
+     * @param ini principio del array
+     * @param fin final del array
+     * 
+     * @return devuelve un objeto de la clase Reunion
      */
-    private Reunion SeleccionarCandidato() {
-        Reunion candidato = new Reunion(0,25,0);                        //Creación de un candidato para las primeras comparaciones
-        
-        for (int i = 0; i < reuniones.size(); i++) {                    
+    private Reunion SeleccionarCandidato(int ini, int fin) {
+        //Reunion candidato = new Reunion(0,25,0);                        //Creación de un candidato para las primeras comparaciones
+        if(ini==fin){
+            return reuniones.get(ini);
+        }else{
+            int med = (ini+fin)/2; 
+            Reunion reunion1 = SeleccionarCandidato(ini, med);
+            Reunion reunion2 = SeleccionarCandidato(med+1, fin);
+            
+            return(reunion1.getHoraFin()<reunion2.getHoraFin()?reunion1:reunion2);
+        }
+        /*for (int i = 0; i < reuniones.size(); i++) {                    
             
             if(reuniones.get(i).getHoraFin()<= candidato.getHoraFin()){ //Condicion para elegir el candidato
                     candidato = reuniones.get(i);
@@ -197,6 +210,6 @@ public class Planifica {
             
         }
         
-        return candidato;
+        return candidato;*/
     }
 }
