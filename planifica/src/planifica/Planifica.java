@@ -12,7 +12,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.Year;
 import java.util.List;
+import java.util.Random;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -23,7 +25,7 @@ import java.util.logging.Logger;
  * @author pablo
  */
 public class Planifica {
-
+	long[] tiempos = new long[50];
     File entrada, salida;
     int numeroDatos;
     List<Reunion> reuniones = new ArrayList<>();
@@ -91,64 +93,91 @@ public class Planifica {
             }    
         }
         
-        if(args.length == 0){ //Se comprueba si se ha elegido un archivo de entrada, en caso negativo se piden datos por teclado, en caso positivo se lee el archivo
-            System.out.println("No se han detectado fichero de entrada, por favor"
-                    + "introduce los datos por teclado con el siguiente formato:[numero de tareas, "
-                    + "inicio de reunion espacio en blanco final de reunion]");
-            
-            System.out.println("Introduce el numero de tareas");
-            numeroDatos = Integer.parseInt(teclado.nextLine());
-            
-            for(int i=0; i<numeroDatos; i++){
-                System.out.println("\nIntroduce el dato "+(i+1));
-                
-                System.out.println("\nIntroduce la hora de entrada");
-                int inicio = Integer.parseInt(teclado.nextLine());
-                
-                System.out.println("\nIntroduce la hora de salida");
-                int fin = Integer.parseInt(teclado.nextLine());
-                
-                Reunion reunion = new Reunion(inicio,fin,i);
-                
-                reuniones.add(reunion);
-            }
-        }else if(args.length > 0){
-            System.out.println(args[0]);
-            FileReader f = null;
-            try {
-                entrada = new File(args[0]+".txt");
-                f = new FileReader(entrada);
-                BufferedReader b = new BufferedReader(f);
-                
-                numeroDatos = Integer.parseInt(b.readLine());
-                
-                for(int i = 0; i< numeroDatos; i++){
-                    String[] horasString = b.readLine().split(" ");
-                    Integer[] horas = new Integer[horasString.length];
-                    
-                    horas[0] = Integer.parseInt(horasString[0]);
-                    horas[1] = Integer.parseInt(horasString[1]);
-                    
-                    Reunion reunion = new Reunion(horas[0], horas[1], i);
-                    
-                    reuniones.add(reunion);
-                }
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(Planifica.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                Logger.getLogger(Planifica.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                try {
-                    f.close();
-                } catch (IOException ex) {
-                    Logger.getLogger(Planifica.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            
-        }
+		if (args.length == 0) { // Se comprueba si se ha elegido un archivo de entrada, en caso negativo se
+								// piden datos por teclado, en caso positivo se lee el archivo
+			System.out.println(
+					"No se han detectado fichero de entrada, por favor indique si quiere reuniones aleatorias (Y para si, N para no)");
+
+			String seleccion = teclado.nextLine();
+			if (seleccion.equals("y")) {
+				
+				System.out.println("Introduce el numero de tareas");
+				numeroDatos = Integer.parseInt(teclado.nextLine());
+				GenerateReunionesAleatorias(numeroDatos);
+				
+			} else {
+
+				System.out.println("No se han detectado fichero de entrada, por favor"
+						+ "introduce los datos por teclado con el siguiente formato:[numero de tareas, "
+						+ "inicio de reunion espacio en blanco final de reunion]");
+
+				System.out.println("Introduce el numero de tareas");
+				numeroDatos = Integer.parseInt(teclado.nextLine());
+
+				for (int i = 0; i < numeroDatos; i++) {
+					System.out.println("\nIntroduce el dato " + (i + 1));
+
+					System.out.println("\nIntroduce la hora de entrada");
+					int inicio = Integer.parseInt(teclado.nextLine());
+					int fin = -1;
+					while(fin < inicio) {
+					System.out.println("\nIntroduce la hora de salida");
+					 fin = Integer.parseInt(teclado.nextLine());
+					}
+					
+					Reunion reunion = new Reunion(inicio, fin, i);
+
+					reuniones.add(reunion);
+				}
+			}
+		} else if (args.length > 0) {
+			System.out.println(args[0]);
+			FileReader f = null;
+			try {
+				entrada = new File(args[0] + ".txt");
+				f = new FileReader(entrada);
+				BufferedReader b = new BufferedReader(f);
+
+				numeroDatos = Integer.parseInt(b.readLine());
+
+				for (int i = 0; i < numeroDatos; i++) {
+					String[] horasString = b.readLine().split(" ");
+					Integer[] horas = new Integer[horasString.length];
+
+					horas[0] = Integer.parseInt(horasString[0]);
+					horas[1] = Integer.parseInt(horasString[1]);
+
+					Reunion reunion = new Reunion(horas[0], horas[1], i);
+
+					reuniones.add(reunion);
+				}
+			} catch (FileNotFoundException ex) {
+				Logger.getLogger(Planifica.class.getName()).log(Level.SEVERE, null, ex);
+			} catch (IOException ex) {
+				Logger.getLogger(Planifica.class.getName()).log(Level.SEVERE, null, ex);
+			} finally {
+				try {
+					f.close();
+				} catch (IOException ex) {
+					Logger.getLogger(Planifica.class.getName()).log(Level.SEVERE, null, ex);
+				}
+			}
+
+		}
         
-        AlgoritmoVoraz(); //Llamada al algoritmo voraz
-        
+		for (int i = 0; i < 50; i++) {
+			long media = 0;
+			for (int j = 0; j < 50; j++) {
+				reuniones.clear();				
+				GenerateReunionesAleatorias((i+1) * 1000);
+				long start = System.nanoTime();
+				AlgoritmoVoraz();
+				media += System.nanoTime() -start;
+				solucion.clear();
+			}
+			media = media/50;
+			tiempos[i] = media;
+		}
         if(args.length < 2 || !archivoDeSalida){ //Se comprueba si se ha elegido un archivo de salida, en caso negativo se imprime por pantalla en caso positivo se escribe en el fichero
             
             System.out.print("La solución es: ");
@@ -212,4 +241,19 @@ public class Planifica {
         
         return candidato;*/
     }
+    
+    
+    private void GenerateReunionesAleatorias(int numeroDatos) {
+    	Random random = new Random();
+		for (int i = 0; i < numeroDatos; i++) {
+			int inicio =  random.nextInt(24);
+			int horaFinal =inicio+1+random.nextInt(24-inicio);
+			Reunion reunion = new Reunion(inicio, horaFinal, i);			
+			reuniones.add(reunion);
+		}
+		
+    	
+    }
+    
+    
 }

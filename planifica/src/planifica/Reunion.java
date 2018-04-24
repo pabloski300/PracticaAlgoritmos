@@ -53,12 +53,18 @@ class Reunion {
         this.ID = ID;
         if(horaFin != 0){
             this.duracion = horaFin - horaInicio;
-        }else if(horaFin == 0){
+        }else if(this.horaFin == 0 || this.horaFin > 24){
             this.duracion = 24 - horaInicio;
         }
     }
     
-    public void ActualizarHoras(Reunion candidato){
+    @Override
+	public String toString() {
+		return "Reunion [horaInicio=" + horaInicio + ", horaFin=" + horaFin + ", ID=" + ID + ", duracion=" + duracion
+				+ "]";
+	}
+
+	public void ActualizarHoras(Reunion candidato){
         this.horaInicio -= candidato.getHoraFin();
         this.horaFin -= candidato.getHoraFin();
     }
