@@ -13,7 +13,6 @@ class Reunion {
     private int horaInicio;
     private int horaFin;
     private int ID;
-    private int duracion;
 
     public int getHoraInicio() {
         return horaInicio;
@@ -39,33 +38,21 @@ class Reunion {
         this.ID = ID;
     }
 
-    public int getDuracion() {
-        return duracion;
-    }
-
-    public void setDuracion(int duracion) {
-        this.duracion = duracion;
-    }
 
     public Reunion(int horaInicio, int horaFin, int ID) {
         this.horaInicio = horaInicio;
-        this.horaFin = horaFin;
         this.ID = ID;
-        if(horaFin != 0){
-            this.duracion = horaFin - horaInicio;
-        }else if(this.horaFin == 0 || this.horaFin > 24){
-            this.duracion = 24 - horaInicio;
+        if(horaFin == 0 || horaFin > 24){
+            this.horaFin = 24;
+        }else{
+            this.horaFin = horaFin;
         }
     }
-    
-    @Override
-	public String toString() {
-		return "Reunion [horaInicio=" + horaInicio + ", horaFin=" + horaFin + ", ID=" + ID + ", duracion=" + duracion
-				+ "]";
-	}
 
-	public void ActualizarHoras(Reunion candidato){
-        this.horaInicio -= candidato.getHoraFin();
-        this.horaFin -= candidato.getHoraFin();
+    @Override
+    public String toString() {
+        return "Reunion{" + "horaInicio=" + horaInicio + ", horaFin=" + horaFin + ", ID=" + ID + '}';
     }
+    
+
 }
