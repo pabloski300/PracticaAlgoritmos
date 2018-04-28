@@ -42,16 +42,12 @@ class Reunion {
     public Reunion(int horaInicio, int horaFin, int ID) {
         this.horaInicio = horaInicio;
         this.ID = ID;
-        if(horaFin == 0 || horaFin > 24){
-            this.horaFin = 24;
-        }else{
-            this.horaFin = horaFin;
-        }
+        this.horaFin = horaFin;
     }
 
     @Override
     public String toString() {
-        return "Reunion{" + "horaInicio=" + horaInicio + ", horaFin=" + horaFin + ", ID=" + ID + '}';
+        return ID+" "+ horaInicio + " " + horaFin ;
     }
     
 

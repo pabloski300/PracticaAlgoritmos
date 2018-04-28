@@ -132,12 +132,14 @@ public class Planifica {
                 for (int i = 0; i < numeroDatos; i++) {
                     String[] horasString = b.readLine().split(" ");
                     Integer[] horas = new Integer[horasString.length];
+                    int indice;
 
-                    horas[0] = Integer.parseInt(horasString[0]);
-                    horas[1] = Integer.parseInt(horasString[1]);
+                    indice = Integer.parseInt(horasString[0]);
+                    horas[0] = Integer.parseInt(horasString[1]);
+                    horas[1] = Integer.parseInt(horasString[2]);
 
-                    Reunion reunion = new Reunion(horas[0], horas[1], i);
-                    
+                    Reunion reunion = new Reunion(horas[0], horas[1], indice);
+
                     reuniones.add(reunion);
                 }
             } catch (FileNotFoundException ex) {
@@ -153,19 +155,19 @@ public class Planifica {
             }
 
         }
-        
+
         //for (int i = 0; i < 50; i++) {
-            //long media = 0;
-            //for (int j = 0; j < 50; j++) {
-                //reuniones.clear();
-                //GenerateReunionesAleatorias((i + 1) * 1000);
-                //long start = System.nanoTime();
-                AlgoritmoVoraz();
-                //media += System.nanoTime() - start;
-                //solucion.clear();
-            //}
-            //media = media / 50;
-            //tiempos[i] = media;
+        //long media = 0;
+        //for (int j = 0; j < 50; j++) {
+        //reuniones.clear();
+        //GenerateReunionesAleatorias((i + 1) * 1000);
+        //long start = System.nanoTime();
+        AlgoritmoVoraz();
+        //media += System.nanoTime() - start;
+        //solucion.clear();
+        //}
+        //media = media / 50;
+        //tiempos[i] = media;
         //}
         if (args.length < 2 || !archivoDeSalida) { //Se comprueba si se ha elegido un archivo de salida, en caso negativo se imprime por pantalla en caso positivo se escribe en el fichero
 
@@ -211,7 +213,7 @@ public class Planifica {
      * @return devuelve un objeto de la clase Reunion
      */
     private Reunion SeleccionarCandidato() {
-        Reunion candidato = new Reunion(0, 25, 0);                        //Creación de un candidato para las primeras comparaciones
+        Reunion candidato = new Reunion(0, 50, 0);                        //Creación de un candidato para las primeras comparaciones
         for (int i = 0; i < reuniones.size(); i++) {
             if (reuniones.get(i).getHoraFin() < candidato.getHoraFin()) { //Condicion para elegir el candidato
                 candidato = reuniones.get(i);
@@ -227,7 +229,8 @@ public class Planifica {
         for (int i = 0; i < numeroDatos; i++) {
             int inicio = random.nextInt(24);
             int horaFinal = inicio + 1 + random.nextInt(24 - inicio);
-            Reunion reunion = new Reunion(inicio, horaFinal, i);
+            Reunion reunion = new Reunion(inicio, horaFinal, i + 1);
+            System.out.println(reunion);
             reuniones.add(reunion);
         }
 
