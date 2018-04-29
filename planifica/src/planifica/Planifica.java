@@ -27,7 +27,7 @@ public class Planifica {
 
     long[] tiempos = new long[50];
     File entrada, salida;
-    int numeroDatos;
+    //int numeroDatos;
     List<Reunion> reuniones = new ArrayList<>();
     List<Integer> solucion = new ArrayList<>();
     Scanner teclado = new Scanner(System.in);
@@ -68,8 +68,8 @@ public class Planifica {
     }
 
     /**
-     * Este es el método encargado de las lecturas y escrituras de ficheros y de
-     * las entradas por teclado y salidas por pantalla.
+     * Este es el método encargado de llevar la ejecucion principarl del
+     * programa
      *
      * @param args
      */
@@ -91,69 +91,22 @@ public class Planifica {
             if (seleccion.equals("y")) {
 
                 System.out.println("Introduce el numero de tareas");
-                numeroDatos = Integer.parseInt(teclado.nextLine());
+                int numeroDatos = Integer.parseInt(teclado.nextLine());
                 GenerateReunionesAleatorias(numeroDatos);
 
             } else {
 
-                System.out.println("No se han detectado fichero de entrada, por favor"
-                        + "introduce los datos por teclado con el siguiente formato:[numero de tareas, "
-                        + "inicio de reunion espacio en blanco final de reunion]");
+                System.out.println("introduce los datos por teclado");
 
                 System.out.println("Introduce el numero de tareas");
-                numeroDatos = Integer.parseInt(teclado.nextLine());
+                int numeroDatos = Integer.parseInt(teclado.nextLine());
 
-                for (int i = 0; i < numeroDatos; i++) {
-                    System.out.println("\nIntroduce el dato " + (i + 1));
-
-                    System.out.println("\nIntroduce la hora de entrada");
-                    int inicio = Integer.parseInt(teclado.nextLine());
-                    int fin = -1;
-                    while (fin < inicio) {
-                        System.out.println("\nIntroduce la hora de salida");
-                        fin = Integer.parseInt(teclado.nextLine());
-                    }
-
-                    Reunion reunion = new Reunion(inicio, fin, i);
-
-                    reuniones.add(reunion);
-                }
+                GenerarReunionesElegidas(numeroDatos);
             }
         } else if (args.length > 0) {
             System.out.println(args[0]);
-            FileReader f = null;
-            try {
-                entrada = new File(args[0] + ".txt");
-                f = new FileReader(entrada);
-                BufferedReader b = new BufferedReader(f);
 
-                numeroDatos = Integer.parseInt(b.readLine());
-
-                for (int i = 0; i < numeroDatos; i++) {
-                    String[] horasString = b.readLine().split(" ");
-                    Integer[] horas = new Integer[horasString.length];
-                    int indice;
-
-                    indice = Integer.parseInt(horasString[0]);
-                    horas[0] = Integer.parseInt(horasString[1]);
-                    horas[1] = Integer.parseInt(horasString[2]);
-
-                    Reunion reunion = new Reunion(horas[0], horas[1], indice);
-
-                    reuniones.add(reunion);
-                }
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(Planifica.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                Logger.getLogger(Planifica.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                try {
-                    f.close();
-                } catch (IOException ex) {
-                    Logger.getLogger(Planifica.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-
+            GenerarReunionesFichero(args[0]);
         }
 
         //for (int i = 0; i < 50; i++) {
@@ -171,34 +124,12 @@ public class Planifica {
         //}
         if (args.length < 2 || !archivoDeSalida) { //Se comprueba si se ha elegido un archivo de salida, en caso negativo se imprime por pantalla en caso positivo se escribe en el fichero
 
-            System.out.print("La solución es: ");
+            EscribirPorPantalla();
 
-            for (int i = 0; i < solucion.size(); i++) {
-                System.out.print(solucion.get(i) + ", ");
-            }
         } else if (args.length >= 2 && archivoDeSalida) {
             System.out.println(args[1]);
-            salida = new File(args[1] + ".txt");
 
-            FileWriter f = null;
-            try {
-                f = new FileWriter(salida);
-                PrintWriter p = new PrintWriter(f);
-
-                for (int i = 0; i < solucion.size(); i++) {
-                    p.println(solucion.get(i));
-                }
-
-            } catch (IOException ex) {
-                Logger.getLogger(Planifica.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                try {
-                    f.close();
-                } catch (IOException ex) {
-                    Logger.getLogger(Planifica.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-
+            EscribirEnFichero(args[1]);
         }
     }
 
@@ -206,9 +137,6 @@ public class Planifica {
      * Esta funcion se encarga de elegir el mejor condidato de la lista de
      * candidatos para ello se escoge el candidato con menor hora de
      * finalizacion.
-     *
-     * @param ini principio del array
-     * @param fin final del array
      *
      * @return devuelve un objeto de la clase Reunion
      */
@@ -224,16 +152,126 @@ public class Planifica {
         return candidato;
     }
 
+    /**
+     * Esta funcion se encarga de generar un numero de runiones aleatorias
+     *
+     * @param numeroDatos nº de datos a generar
+     */
     private void GenerateReunionesAleatorias(int numeroDatos) {
         Random random = new Random();
         for (int i = 0; i < numeroDatos; i++) {
             int inicio = random.nextInt(24);
             int horaFinal = inicio + 1 + random.nextInt(24 - inicio);
-            Reunion reunion = new Reunion(inicio, horaFinal, i + 1);
+            Reunion reunion = new Reunion(inicio, horaFinal, i);
             System.out.println(reunion);
             reuniones.add(reunion);
         }
 
+    }
+
+    /**
+     * Esta funcion se encarga de generar un numero de runiones que se eligen
+     * una por una por el usuario
+     *
+     * @param numeroDatos nº de datos a generar
+     */
+    private void GenerarReunionesElegidas(int numeroDatos) {
+
+        for (int i = 0; i < numeroDatos; i++) {
+            System.out.println("\nIntroduce el dato " + (i + 1));
+
+            System.out.println("\nIntroduce la hora de entrada");
+            int inicio = Integer.parseInt(teclado.nextLine());
+            int fin = -1;
+            while (fin < inicio) {
+                System.out.println("\nIntroduce la hora de salida");
+                fin = Integer.parseInt(teclado.nextLine());
+            }
+
+            Reunion reunion = new Reunion(inicio, fin, i);
+
+            reuniones.add(reunion);
+        }
+    }
+
+    /**
+     * Esta funcion se encarga de generar un numero de reuniones leidas de un
+     * fichero
+     *
+     * @param arg nombre del fichero sin extension
+     */
+    private void GenerarReunionesFichero(String arg) {
+        FileReader f = null;
+        try {
+            entrada = new File(arg + ".txt");
+            f = new FileReader(entrada);
+            BufferedReader b = new BufferedReader(f);
+
+            int numeroDatos = Integer.parseInt(b.readLine());
+
+            for (int i = 0; i < numeroDatos; i++) {
+                String[] horasString = b.readLine().split(" ");
+                Integer[] horas = new Integer[horasString.length];
+                int indice;
+
+                indice = Integer.parseInt(horasString[0]);
+                horas[0] = Integer.parseInt(horasString[1]);
+                horas[1] = Integer.parseInt(horasString[2]);
+
+                Reunion reunion = new Reunion(horas[0], horas[1], i);
+
+                reuniones.add(reunion);
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Planifica.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Planifica.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                f.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Planifica.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    /**
+     * Esta funcion se encarga de mostrar la solucion en pantalla
+     */
+    private void EscribirPorPantalla() {
+        System.out.println("La solución es: ");
+
+        for (int i = 0; i < solucion.size(); i++) {
+            System.out.println(solucion.get(i));
+        }
+    }
+
+    /**
+     * Esta funcion se encarga de escribir la solucion en un fichero
+     *
+     * @param arg nombre del fichero sin extension
+     */
+    private void EscribirEnFichero(String arg) {
+        salida = new File(arg + ".txt");
+
+        FileWriter f = null;
+        try {
+            f = new FileWriter(salida);
+            PrintWriter p = new PrintWriter(f);
+
+            for (int i = 0; i < solucion.size(); i++) {
+                p.println(solucion.get(i));
+            }
+
+        } catch (IOException ex) {
+            Logger.getLogger(Planifica.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                f.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Planifica.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
 }
